@@ -1,4 +1,4 @@
-use crate::agent::models::AttackEvent;
+use super::models::AttackEvent;
 use regex::Regex;
 use std::time::{SystemTime, UNIX_EPOCH};
 
