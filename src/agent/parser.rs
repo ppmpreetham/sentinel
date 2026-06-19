@@ -21,33 +21,33 @@ impl AttackParser {
         let timestamp = SystemTime::now().duration_since(UNIX_EPOCH).ok()?.as_secs();
 
         // ssh
-        if let Some(caps) = self.ssh.captures(line) {
+        if let Some(captures) = self.ssh.captures(line) {
             return Some(AttackEvent {
-                ip: caps.get(2)?.as_str().to_string(),
-                service: "ssh".to_string(),
-                username: caps.get(1)?.as_str().to_string(),
+                ip: captures.get(2)?.as_str().to_string(),
+                service: "SSH".to_string(),
+                username: captures.get(1)?.as_str().to_string(),
                 timestamp,
                 event_type: "brute_force".to_string(),
             });
         }
 
         // ftp
-        if let Some(caps) = self.ftp.captures(line) {
+        if let Some(captures) = self.ftp.captures(line) {
             return Some(AttackEvent {
-                ip: caps.get(2)?.as_str().to_string(),
-                service: "ftp".to_string(),
-                username: caps.get(1)?.as_str().to_string(),
+                ip: captures.get(2)?.as_str().to_string(),
+                service: "FTP".to_string(),
+                username: captures.get(1)?.as_str().to_string(),
                 timestamp,
                 event_type: "brute_force".to_string(),
             });
         }
 
         // http
-        if let Some(caps) = self.http.captures(line) {
+        if let Some(captures) = self.http.captures(line) {
             return Some(AttackEvent {
-                ip: caps.get(1)?.as_str().to_string(),
-                service: "http".to_string(),
-                username: caps.get(2)?.as_str().to_string(),
+                ip: captures.get(1)?.as_str().to_string(),
+                service: "HTTP".to_string(),
+                username: captures.get(2)?.as_str().to_string(),
                 timestamp,
                 event_type: "unauthorized_access".to_string(),
             });
