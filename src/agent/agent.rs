@@ -24,6 +24,7 @@ fn read_log(reader: &mut BufReader<File>, line: &mut String, parser: &AttackPars
     match reader.read_line(line) {
         Ok(0) => {
             // EOF
+            std::thread::sleep(std::time::Duration::from_millis(100));
         }
         Ok(usize) => {
             if let Some(event) = parser.parse_line(line) {
