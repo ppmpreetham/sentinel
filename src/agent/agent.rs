@@ -4,6 +4,7 @@ use super::models::AttackEvent;
 use super::parser::AttackParser;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Seek, SeekFrom};
+use std::usize;
 
 const LOG_PATH: &str = "/var/log/auth.log";
 
@@ -24,6 +25,14 @@ fn read_log(reader: &mut BufReader<File>, line: &mut String, parser: &AttackPars
         Ok(0) => {
             // EOF
         }
-        Err(_) => eprintln("error reading the file..."),
+        Ok(usize) => {
+            if let Some(event) = parser.parse_line(line) {
+                println!("target event detected, {}", event.event_type);
+            }
+            line.clear();
+        }
+        Err(_) => {
+            eprintln!("error reading the file...");
+        }
     }
 }
