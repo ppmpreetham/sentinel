@@ -1,15 +1,29 @@
 # Sentinel
 
+A global honeypot service.
+
+Check out the approach at [APPROACH.md](./APPROACH.md)
+
+## Architecture:
+
 ```text
-auth.log
-   |
-   v
-Rust Agent
-   |
-   | POST /events
-   v
-Axum API
-   |
-   v
-Postgres
+                API Gateway
+                      |
+             Threat Intelligence
+                      |
+    ---------------------------------------
+    |                |                    |
+ Query Service   Reputation Engine   Alert Engine
+    |                |                    |
+    ---------------------------------------
+                      |
+                    Kafka
+                      |
+    ---------------------------------------
+    |          |          |              |
+ Collector  Aggregator  Detection   Analytics
+                      |
+                  PostgreSQL
+                      |
+                Read Replicas
 ```
