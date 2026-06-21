@@ -13,10 +13,15 @@ pub fn config() -> &'static Config {
         })
     })
 }
+
 impl Config {
     fn load_from_env() -> Result<Self, String> {
         Ok(Config {
             db_url: get_env("DATABASE_URL")?,
         })
     }
+}
+
+pub fn get_env(key: &str) -> Result<String, String> {
+    std::env::var(key).map_err(|_| format!("Missing required environment variable: {key}"))
 }

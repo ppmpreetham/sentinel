@@ -1,7 +1,8 @@
 mod agent;
 mod config;
 mod server;
+mod services;
 
 fn main() {
-    println!("Hello, world!");
+    config::config();
 }

@@ -1,9 +1,15 @@
 use axum::{Router, routing::get};
 use tokio;
 
+use crate::{config::config, services::pg::pg_pool};
+
 #[tokio::main]
 async fn router() {
-    let routes = Router::<()>::new()
+    let pool = pg_pool().await;
+
+    let routes = Router::new()
         .route("/n", get(|| async { "no" }))
-        .route("/y", get(|| async { "yes" }));
+        .route("/y", get(|| async { "yes" }))
+        // .with_state(config())
+        ;
 }
