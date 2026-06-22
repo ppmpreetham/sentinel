@@ -1,8 +1,7 @@
 CREATE TABLE attack_events (
     id BIGSERIAL PRIMARY KEY,
-    ip VARCHAR(45) NOT NULL,
+    ip INET NOT NULL,
     service VARCHAR(50) NOT NULL,
-    country VARCHAR(50),
     username VARCHAR(255),
     event_type VARCHAR(50) NOT NULL,
     timestamp BIGINT NOT NULL,

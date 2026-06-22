@@ -1,13 +1,13 @@
 use serde::Serialize;
+use sqlx::types::ipnetwork::IpNetwork;
 use sqlx::{self, PgPool};
 
 #[derive(Debug, Serialize, sqlx::FromRow)]
 pub struct AttackEventDBModel {
     pub id: i64,
-    pub ip: String,
+    pub ip: IpNetwork,
     pub service: String,
     #[serde(skip_serializing)]
-    pub country: Option<String>,
     pub username: Option<String>,
     pub event_type: String,
     pub timestamp: i64,
@@ -21,10 +21,10 @@ pub async fn select_events(
 ) -> Result<Vec<AttackEventDBModel>, sqlx::Error> {
     let events = sqlx::query_as!(
         AttackEventDBModel,
-        "SELECT id, ip, service, country, username, event_type, timestamp
+        "SELECT id, ip, service, username, event_type, timestamp
         FROM attack_events
         WHERE $1::bigint IS NULL OR id < $1
-        ORDER BY timestamp DESC
+        ORDER BY id DESC
         LIMIT $2",
         cursor,
         limit
@@ -42,7 +42,7 @@ pub async fn select_event(
 ) -> Result<Option<AttackEventDBModel>, sqlx::Error> {
     sqlx::query_as!(
         AttackEventDBModel,
-        "SELECT id, ip, service, country, username, event_type, timestamp FROM attack_events WHERE id = $1",
+        "SELECT id, ip, service, username, event_type, timestamp FROM attack_events WHERE id = $1",
         event_id
     )
     .fetch_optional(pool)
