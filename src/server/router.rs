@@ -2,7 +2,8 @@ use axum::{Router, routing::get};
 use tokio;
 
 use super::state::AppState;
-use crate::services::pg::pg_pool;
+use crate::db::pg::pg_pool;
+
 #[tokio::main]
 async fn router() {
     let state = AppState {
