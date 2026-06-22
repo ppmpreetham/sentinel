@@ -1,15 +1,16 @@
 use axum::{Router, routing::get};
 use tokio;
 
-use crate::{config::config, services::pg::pg_pool};
-
+use super::state::AppState;
+use crate::services::pg::pg_pool;
 #[tokio::main]
 async fn router() {
-    let pool = pg_pool().await;
+    let state = AppState {
+        db_pool: pg_pool().await,
+    };
 
-    let routes = Router::new()
+    let routes: Router = Router::new()
         .route("/n", get(|| async { "no" }))
         .route("/y", get(|| async { "yes" }))
-        // .with_state(config())
-        ;
+        .with_state(state);
 }

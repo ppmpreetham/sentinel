@@ -1,17 +1,9 @@
+use dotenvy::dotenv;
 use std::{env, sync::OnceLock};
 
 #[derive(Debug)]
 pub struct Config {
     pub db_url: String,
-}
-
-pub fn config() -> &'static Config {
-    static INSTANCE: OnceLock<Config> = OnceLock::new();
-    INSTANCE.get_or_init(|| {
-        Config::load_from_env().unwrap_or_else(|e| {
-            panic!("could not load config. Error: {e}");
-        })
-    })
 }
 
 impl Config {
@@ -22,6 +14,16 @@ impl Config {
     }
 }
 
+pub fn config() -> &'static Config {
+    static INSTANCE: OnceLock<Config> = OnceLock::new();
+    INSTANCE.get_or_init(|| {
+        dotenv().ok();
+        Config::load_from_env().unwrap_or_else(|e| {
+            panic!("could not load config. Error: {e}");
+        })
+    })
+}
+
 pub fn get_env(key: &str) -> Result<String, String> {
-    std::env::var(key).map_err(|_| format!("Missing required environment variable: {key}"))
+    env::var(key).map_err(|_| format!("Missing required environment variable: {key}"))
 }
