@@ -1,12 +1,15 @@
+use axum::Router;
+use axum::http::StatusCode;
+use axum::routing::get;
 use axum::{
+    Json,
     extract::{Path, State},
     response::{IntoResponse, Response},
 };
 use serde::{Deserialize, Serialize};
-use sqlx::{
-    PgPool,
-    types::{Json, ipnetwork::IpNetwork},
-};
+use sqlx::{PgPool, types::ipnetwork::IpNetwork};
+
+use crate::server::state::AppState;
 
 #[derive(Serialize, Deserialize)]
 struct IPRoute {
@@ -16,17 +19,17 @@ struct IPRoute {
     last_seen: Option<i64>,
 }
 
-pub async fn get_ip(
+pub fn ip_router() -> Router<AppState> {
+    Router::new().route("/ip/:ip", get(get_ip))
+}
+
+async fn get_ip(
     State(pool): State<PgPool>,
     Path(ip): Path<String>,
 ) -> Result<Json<IPRoute>, Response> {
-    let target_ip: IpNetwork = ip.parse().map_err(|_| {
-        (
-            axum::http::StatusCode::BAD_REQUEST,
-            "Invalid IP address format",
-        )
-            .into_response()
-    })?;
+    let target_ip: IpNetwork = ip
+        .parse()
+        .map_err(|_| (StatusCode::BAD_REQUEST, "Invalid IP address format").into_response())?;
 
     let route_data = sqlx::query_as!(
         IPRoute,
@@ -43,7 +46,7 @@ pub async fn get_ip(
     )
     .fetch_one(&pool)
     .await
-    .map_err(|e| (axum::http::StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response())?;
+    .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Internal Service Error").into_response())?;
 
     Ok(Json(route_data))
 }

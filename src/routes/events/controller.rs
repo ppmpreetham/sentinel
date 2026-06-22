@@ -29,11 +29,11 @@ pub async fn get_events_handler(
 // GET /event/420
 pub async fn get_event_handler(
     State(pool): State<PgPool>,
-    Path(event_id): Path<i64>,
+    Path(id): Path<i64>,
 ) -> Result<Json<AttackEventDBModel>, Response> {
-    let event = select_event(&pool, event_id)
-        .await
-        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, "Database error").into_response())?;
+    let event = select_event(&pool, id).await.map_err(|_| {
+        (StatusCode::INTERNAL_SERVER_ERROR, "Internal Service Error").into_response()
+    })?;
 
     match event {
         Some(item) => Ok(Json(item)),
