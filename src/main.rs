@@ -2,7 +2,7 @@
 mod agent;
 mod config;
 mod db;
-mod features;
+mod routes;
 mod server;
 mod utils;
 

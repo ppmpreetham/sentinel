@@ -9,7 +9,7 @@ use std::result::Result;
 
 use super::repository::AttackEventDBModel;
 use crate::{
-    features::events::repository::{select_event, select_events},
+    routes::events::repository::{select_event, select_events},
     utils::paginate::{PaginatedJson, PaginatedResponse, PaginationQuery},
 };
 

@@ -6,7 +6,7 @@ use tokio;
 
 use super::state::AppState;
 use crate::db::pg::pg_pool;
-use crate::features::events::events_router;
+use crate::routes::events::events_router;
 
 pub async fn router() -> Router {
     let pool = pg_pool().await;
