@@ -1,8 +1,11 @@
 mod agent;
 mod config;
 mod db;
+mod features;
 mod server;
-mod services;
-fn main() {
+
+#[tokio::main]
+async fn main() {
     config::config();
+    server::server::run();
 }

@@ -4,12 +4,14 @@ use std::{env, sync::OnceLock};
 #[derive(Debug)]
 pub struct Config {
     pub db_url: String,
+    pub server_url: String,
 }
 
 impl Config {
     fn load_from_env() -> Result<Self, String> {
         Ok(Config {
             db_url: get_env("DATABASE_URL")?,
+            server_url: get_env("SERVER_URL")?,
         })
     }
 }

@@ -13,9 +13,10 @@ Postgres
 ```
 
 for now, agent can check logs for 3 types:
-ssh
-http
-ftp
+
+- ssh
+- http
+- ftp
 
 and everything is stored as
 
@@ -44,3 +45,5 @@ ON attack_events (source_ip);
 CREATE INDEX idx_attack_events_timestamp
 ON attack_events (event_timestamp);
 ```
+
+using partial index for usernames like `root` and `admin` help us find abnormal anomallies faster
