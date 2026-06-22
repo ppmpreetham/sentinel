@@ -6,6 +6,7 @@ use tokio;
 
 use super::state::AppState;
 use crate::db::pg::pg_pool;
+use crate::features::events::events_router;
 
 pub async fn router() -> Router {
     let pool = pg_pool().await;
@@ -15,6 +16,7 @@ pub async fn router() -> Router {
     let routes: Router = Router::new()
         .route("/n", get(|| async { "no" }))
         .route("/y", get(|| async { "yes" }))
+        .merge(events_router())
         .with_state(state);
 
     routes
