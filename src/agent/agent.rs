@@ -11,6 +11,7 @@ const LOG_PATH: &str = "/var/log/auth.log";
 fn checker() {
     let file = File::open(LOG_PATH).expect("log file not found");
     let mut reader = BufReader::new(file);
+
     // real time tracking by jumping to end
     reader.seek(SeekFrom::End(0));
     let parser = AttackParser::new();
