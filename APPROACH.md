@@ -25,7 +25,6 @@ CREATE TABLE attack_events (
     id BIGSERIAL PRIMARY KEY,
     ip VARCHAR(45) NOT NULL,
     service VARCHAR(50) NOT NULL,
-    country VARCHAR(50),
     event_type VARCHAR(50) NOT NULL,
     timestamp BIGINT NOT NULL,
     payload JSONB
@@ -47,3 +46,19 @@ ON attack_events (event_timestamp);
 ```
 
 using partial index for usernames like `root` and `admin` help us find abnormal anomallies faster
+
+Now for the APIs
+
+### /events
+
+#### KeySet pagination
+
+When first tried with `OFFSET`, it caused **Data Drifting** during inserts.
+So, I switched to Keyset pagination. Instead of calculating where you are in the list, it looks at the boundaries of the data.
+
+```sql
+WHERE $1::bigint IS NULL OR id < $1
+LIMIT $2
+```
+
+basically operates as `WHERE [First Page Check] OR [Next Page Bookmark]`
