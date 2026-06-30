@@ -42,6 +42,8 @@ pub async fn db_stats(pool: &PgPool) -> DBResult<Stats> {
 
     Ok(query)
 }
+
+// GET /stats/services
 #[derive(Serialize, Deserialize)]
 pub struct Service {
     service: String,
@@ -65,4 +67,29 @@ pub async fn get_stats_services(
     .await?;
 
     Ok(Json(result))
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Username {
+    username: Option<String>,
+    attempts: i64,
+}
+
+// GET /stats/usernames
+pub async fn get_usernames(State(pool): State<PgPool>) -> Result<Json<Vec<Username>>, AppError> {
+    let res = sqlx::query_as!(
+        Username,
+        r#"
+        SELECT
+            username, count(username) AS "attempts!"
+        FROM attack_events
+        WHERE username IN ('root', 'admin')
+        GROUP BY username
+        ORDER BY "attempts!" DESC
+        "#
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    Ok(Json(res))
 }
