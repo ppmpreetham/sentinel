@@ -1,9 +1,9 @@
-use axum::{Router, routing::get};
-
 use super::state::AppState;
 use crate::db::pg::pg_pool;
 use crate::routes::events::events_router;
 use crate::routes::ip::ip_router;
+use axum::{Router, routing::get};
+use tower_http::trace::TraceLayer;
 
 pub async fn router() -> Router {
     let pool = pg_pool().await;
@@ -16,8 +16,8 @@ pub async fn router() -> Router {
         .route("/y", get(|| async { "yes" }))
         .merge(events_router())
         .merge(ip_router())
-        .with_state(state);
         .with_state(state)
+        .layer(TraceLayer::new_for_http());
 
     routes
 }
