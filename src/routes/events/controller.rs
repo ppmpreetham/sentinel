@@ -40,3 +40,6 @@ pub async fn get_event_handler(
         None => Err((StatusCode::NOT_FOUND, "Event not found").into_response()),
     }
 }
+
+// POST /event/420
+// TODO

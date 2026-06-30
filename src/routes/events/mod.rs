@@ -9,5 +9,5 @@ mod repository;
 pub fn events_router() -> Router<AppState> {
     Router::new()
         .route("/events", get(controller::get_events_handler))
-        .route("/event/:id", get(controller::get_event_handler))
+        .route("/event/{id}", get(controller::get_event_handler))
 }

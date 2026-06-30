@@ -7,7 +7,7 @@ use crate::routes::ip::ip_router;
 
 pub async fn router() -> Router {
     let pool = pg_pool().await;
-    sqlx::migrate!("./migrations").run(&pool).await;
+    let _ = sqlx::migrate!("./migrations").run(&pool).await;
 
     let state = AppState { db_pool: pool };
     let routes: Router = Router::new()
@@ -17,6 +17,7 @@ pub async fn router() -> Router {
         .merge(events_router())
         .merge(ip_router())
         .with_state(state);
+        .with_state(state)
 
     routes
 }

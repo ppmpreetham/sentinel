@@ -20,7 +20,7 @@ struct IPRoute {
 }
 
 pub fn ip_router() -> Router<AppState> {
-    Router::new().route("/ip/:ip", get(get_ip))
+    Router::new().route("/ip/{ip}", get(get_ip))
 }
 
 async fn get_ip(
