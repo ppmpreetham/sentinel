@@ -61,7 +61,7 @@ pub async fn get_stats_services(
             COUNT(*) AS count
         FROM attack_events
         GROUP BY service
-        ORDER BY count"#
+        ORDER BY count DESC"#
     )
     .fetch_all(&pool)
     .await?;
