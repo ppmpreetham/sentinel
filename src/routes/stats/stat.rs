@@ -1,5 +1,6 @@
-use axum::http::StatusCode;
-use sqlx::{PgPool, types::Json};
+use crate::db::error::DBResult;
+use axum::Json;
+use sqlx::PgPool;
 
 struct Stats {
     total_events: i64,
@@ -8,7 +9,7 @@ struct Stats {
 }
 
 // GET /stats
-pub async fn get_stats(pool: &PgPool) -> Result<Json<Stats>, (StatusCode, String)> {
+pub async fn get_stats(pool: &PgPool) -> DBResult<Stats> {
     let query = sqlx::query_as!(
         Stats,
         r#"
@@ -27,8 +28,7 @@ pub async fn get_stats(pool: &PgPool) -> Result<Json<Stats>, (StatusCode, String
             "#
     )
     .fetch_one(pool)
-    .await
-    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+    .await?;
 
-    Ok(Json(query))
+    Ok(query)
 }
