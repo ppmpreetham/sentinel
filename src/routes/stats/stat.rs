@@ -1,15 +1,25 @@
-use crate::db::error::DBResult;
-use axum::Json;
+use crate::{
+    db::error::{AppError, DBResult},
+    server::state::AppState,
+};
+use axum::{Json, extract::State};
+use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-struct Stats {
+#[derive(Serialize, Deserialize)]
+pub struct Stats {
     total_events: i64,
     unique_ips: i64,
     top_service: Option<String>,
 }
 
 // GET /stats
-pub async fn get_stats(pool: &PgPool) -> DBResult<Stats> {
+pub async fn get_stats(State(pool): State<PgPool>) -> Result<Json<Stats>, AppError> {
+    let stats = db_stats(&pool).await?;
+    Ok(axum::Json(stats))
+}
+
+pub async fn db_stats(pool: &PgPool) -> DBResult<Stats> {
     let query = sqlx::query_as!(
         Stats,
         r#"
@@ -31,4 +41,28 @@ pub async fn get_stats(pool: &PgPool) -> DBResult<Stats> {
     .await?;
 
     Ok(query)
+}
+#[derive(Serialize, Deserialize)]
+pub struct Service {
+    service: String,
+    count: Option<i64>,
+}
+
+// GET /stats/services
+pub async fn get_stats_services(
+    State(pool): State<PgPool>,
+) -> Result<Json<Vec<Service>>, AppError> {
+    let result = sqlx::query_as!(
+        Service,
+        r#"SELECT
+            service,
+            COUNT(*) AS count
+        FROM attack_events
+        GROUP BY service
+        ORDER BY count"#
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    Ok(Json(result))
 }

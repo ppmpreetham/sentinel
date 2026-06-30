@@ -7,7 +7,7 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, types::ipnetwork::IpNetwork};
 
-use crate::db::error::{AppError, DBResult};
+use crate::db::error::AppError;
 use crate::server::state::AppState;
 
 #[derive(Serialize, Deserialize)]
