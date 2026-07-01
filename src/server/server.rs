@@ -1,4 +1,4 @@
-use crate::config::config;
+use crate::{config::config, messages};
 
 use super::router::router;
 use axum::serve;
@@ -9,6 +9,7 @@ pub async fn run() {
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .init();
 
+    messages::init::init_mpmc().await;
     let addr = &config().server_url;
     let app = router().await;
     let listener = TcpListener::bind(addr).await.expect("Failed to bind");

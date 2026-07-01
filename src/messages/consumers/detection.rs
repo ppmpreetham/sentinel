@@ -1,17 +1,14 @@
 use sqlx::PgPool;
 
-use crate::messages::{bus::EventBus, event::Event};
+use crate::messages::{bus::EventBus, event::Event, rules::RuleEngine};
 
-pub async fn run(bus: EventBus, pool: PgPool) {
+pub async fn run(bus: EventBus) {
     let mut rx = bus.subscribe();
+    let mut engine = RuleEngine::new();
+
     while let Ok(event) = rx.recv().await {
-        match event {
-            Event::Attacked(event) => bus.publish(Event::BruteForced {
-                ip: event.ip,
-                // TODO: PUT THE RIGHT NUMBER HERE
-                attempts: 10,
-            }),
-            _ => {}
+        if let Some(alert) = engine.process(event) {
+            bus.publish(alert);
         }
     }
 }
