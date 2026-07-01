@@ -1,5 +1,6 @@
 use crate::agent::parser;
 use crate::messages::bus::EventBus;
+use crate::messages::collector::collect;
 use crate::messages::event::Event;
 
 use super::models::AttackEvent;
@@ -36,7 +37,7 @@ fn read_log(
         }
         Ok(usize) => {
             if let Some(event) = parser.parse_line(line) {
-                bus.publish(Event::Attacked(event));
+                collect(bus, event);
             }
             line.clear();
         }

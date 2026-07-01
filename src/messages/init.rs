@@ -15,5 +15,7 @@ pub async fn init_mpmc() {
     let pool = pg_pool().await;
     tokio::spawn(storage::run(bus.clone(), pool.clone()));
     tokio::spawn(detection::run(bus.clone()));
-    checker(bus);
+    tokio::task::spawn_blocking(move || {
+        checker(bus);
+    });
 }

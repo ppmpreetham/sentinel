@@ -1,4 +1,5 @@
 pub mod bus;
+pub mod collector;
 pub mod consumers;
 pub mod event;
 pub mod init;
