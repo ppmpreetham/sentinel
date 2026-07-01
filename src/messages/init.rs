@@ -11,6 +11,7 @@ use crate::{
 pub async fn init_mpmc() {
     let bus = EventBus::new();
     let pool = pg_pool().await;
+    // TODO: actually implement these stubs
     tokio::spawn(storage::run(bus.clone(), pool.clone()));
     tokio::spawn(reputation::run(bus.clone()));
     tokio::spawn(analytics::run(bus.clone()));

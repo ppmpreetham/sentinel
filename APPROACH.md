@@ -62,3 +62,20 @@ LIMIT $2
 ```
 
 basically operates as `WHERE [First Page Check] OR [Next Page Bookmark]`
+
+also made a couple endpoints
+GET /ip/:ip
+
+GET /stats
+
+GET /stats/services
+
+GET /stats/usernames
+
+there's no need to index everything, only the ones we query the most
+
+## Event Orchestration
+
+for mpmc, using a message broker is optimal choice.
+so using tokio::broadcast to make a channel of 1024 events to hold in ring buffer is best strategy.
+there's a publish and there's a subscribe method
