@@ -1,4 +1,6 @@
 use crate::agent::parser;
+use crate::messages::bus::EventBus;
+use crate::messages::event::Event;
 
 use super::models::AttackEvent;
 use super::parser::AttackParser;
@@ -8,20 +10,25 @@ use std::usize;
 
 const LOG_PATH: &str = "/var/log/auth.log";
 
-fn checker() {
+pub fn checker(bus: EventBus) {
     let file = File::open(LOG_PATH).expect("log file not found");
     let mut reader = BufReader::new(file);
 
-    // real time tracking by jumping to end
     reader.seek(SeekFrom::End(0));
     let parser = AttackParser::new();
     let mut line = String::new();
+
     loop {
-        read_log(&mut reader, &mut line, &parser);
+        read_log(&mut reader, &mut line, &parser, &bus);
     }
 }
 
-fn read_log(reader: &mut BufReader<File>, line: &mut String, parser: &AttackParser) {
+fn read_log(
+    reader: &mut BufReader<File>,
+    line: &mut String,
+    parser: &AttackParser,
+    bus: &EventBus,
+) {
     match reader.read_line(line) {
         Ok(0) => {
             // EOF
@@ -29,7 +36,7 @@ fn read_log(reader: &mut BufReader<File>, line: &mut String, parser: &AttackPars
         }
         Ok(usize) => {
             if let Some(event) = parser.parse_line(line) {
-                println!("target event detected, {}", event.event_type);
+                bus.publish(Event::Attacked(event));
             }
             line.clear();
         }
