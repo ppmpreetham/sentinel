@@ -1,4 +1,21 @@
 use crate::agent::models::AttackEvent;
+use uuid::Uuid;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ThreatLevel {
+    Low,
+    Medium,
+    High,
+    Critical,
+}
+
+#[derive(Debug, Clone)]
+pub struct Alert {
+    pub id: Uuid,
+    pub ip: String,
+    pub message: String,
+    pub level: ThreatLevel,
+}
 
 #[derive(Clone)]
 pub enum Event {
