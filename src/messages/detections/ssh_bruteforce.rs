@@ -4,9 +4,9 @@ use crate::messages::{bus::EventBus, event::Event};
 use std::{collections::HashMap, time::Duration};
 
 // 5 reqs in a sec
-static BRUTELIMIT: usize = 5;
-static RATELIMIT: u64 = 1;
-static EVICTION_TIME: u64 = 5;
+const BRUTE_FORCE_THRESHOLD: usize = 5;
+const WINDOW_TIME: u64 = 1;
+const EVICTION_TIME: u64 = 5;
 
 struct Incident {
     count: usize,
@@ -34,7 +34,7 @@ pub async fn run(bus: EventBus) {
             alerted: false,
         });
 
-        if now.duration_since(incident.last_seen) >= Duration::from_secs(RATELIMIT) {
+        if now.duration_since(incident.last_seen) >= Duration::from_secs(WINDOW_TIME) {
             incident.count = 1;
             incident.alerted = false;
         } else {
@@ -43,7 +43,7 @@ pub async fn run(bus: EventBus) {
 
         incident.last_seen = now;
 
-        if incident.count >= BRUTELIMIT && !incident.alerted {
+        if incident.count >= BRUTE_FORCE_THRESHOLD && !incident.alerted {
             incident.alerted = true;
             bus.publish(Event::BruteForced {
                 ip: attack.ip.clone(),
