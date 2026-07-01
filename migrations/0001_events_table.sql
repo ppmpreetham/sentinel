@@ -19,3 +19,10 @@ ON attack_events(timestamp);
 CREATE INDEX idx_critical_users
 ON attack_events(username)
 WHERE username IN ('root', 'admin');
+
+CREATE TABLE ip_reputation (
+    ip INET PRIMARY KEY,
+    score INT NOT NULL,
+    total_events BIGINT NOT NULL,
+    last_seen BIGINT NOT NULL
+);
