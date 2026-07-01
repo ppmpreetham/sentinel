@@ -6,10 +6,11 @@ use std::{collections::HashMap, time::Duration};
 // 5 reqs in a sec
 static BRUTELIMIT: usize = 5;
 static RATELIMIT: u64 = 1;
+static EVICTION_TIME: u64 = 5;
 
 struct Incident {
     count: usize,
-    first_seen: Instant,
+    last_seen: Instant,
     alerted: bool,
 }
 
@@ -23,22 +24,24 @@ pub async fn run(bus: EventBus) {
         };
 
         let now = Instant::now();
+        attempts.retain(|_, inc| {
+            now.duration_since(inc.last_seen) < Duration::from_secs(EVICTION_TIME)
+        });
 
-        // reset
         let incident = attempts.entry(attack.ip.clone()).or_insert(Incident {
             count: 0,
-            first_seen: now,
+            last_seen: now,
             alerted: false,
         });
 
-        // reset window
-        if now.duration_since(incident.first_seen) >= Duration::from_secs(RATELIMIT) {
+        if now.duration_since(incident.last_seen) >= Duration::from_secs(RATELIMIT) {
             incident.count = 1;
-            incident.first_seen = now;
             incident.alerted = false;
         } else {
             incident.count += 1;
         }
+
+        incident.last_seen = now;
 
         if incident.count >= BRUTELIMIT && !incident.alerted {
             incident.alerted = true;
